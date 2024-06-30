@@ -5,6 +5,7 @@ import (
 	"image"
 	"image/draw"
 	"log"
+	"math"
 	"os"
 	"path/filepath"
 	"strconv"
@@ -37,27 +38,26 @@ func main() {
 
 	file, err := os.Open(path)
 	if err != nil {
-		log.Println("1")
 		log.Fatal(err)
 	}
 	defer file.Close()
 
+	fileName := file.Name()
+	fmt.Println(fileName)
 
 	imgDecoder, err := decoder.NewDecoder(file, &decoder.Options{})
 	if err != nil {
-		log.Println("3")
 		log.Fatal(err)
 	}
 
-    imageMeta := imgDecoder.GetFeatures();
-	
-    width, height := float32(imageMeta.Width), float32(imageMeta.Height)
+	imageMeta := imgDecoder.GetFeatures()
+
+	width, height := float32(imageMeta.Width), float32(imageMeta.Height)
 	fmt.Printf("width = %d, height = %d\n", imageMeta.Width, imageMeta.Height)
 
-
-	log.Println("hello")
-
 	newW, newH := getNewDimensions(width, height, float32(WTHR))
+
+	fmt.Printf("New_width = %f, New_height = %f\n", newW, newH)
 
 	trims := make([]float32, 4) // top, bottom, left, right
 	if newW != float32(width) {
@@ -83,15 +83,13 @@ func main() {
 
 	trimmedImg := image.NewRGBA(newRect)
 
-    img, err := imgDecoder.Decode()
-    if err != nil {
-		log.Println("3")
+	img, err := imgDecoder.Decode()
+	if err != nil {
 		log.Fatal(err)
 	}
 
 	draw.Draw(trimmedImg, trimmedImg.Bounds(), img, image.Point{int(trims[2]), int(trims[0])}, draw.Src)
 
-	log.Println("hello")
 	output, err := os.Create("output.webp")
 	if err != nil {
 		log.Fatal(err)
@@ -105,39 +103,33 @@ func main() {
 
 	err = webp.Encode(output, trimmedImg, options)
 	if err != nil {
-		log.Println("4")
 		log.Fatal(err)
 	}
-
 
 	fmt.Printf("Save output.webp ok\n")
 
 }
 
-/*
-w=10
-h=5
-r=2
-nr=1.5
-nw=h*nr=7.5
-*/
-
-/*
-h=8
-w=4
-r=0.5
-nr=1
-nh=w*nr
-*/
-
 // take Width Height and Width to Height Ratio
 func getNewDimensions(w float32, h float32, WTHR float32) (float32, float32) {
 	originalWTHR := w / h
-	if originalWTHR == WTHR {
+	epsilon := 1e-5
+
+	if math.Abs(float64(originalWTHR-WTHR)) < epsilon {
 		return w, h
 	} else if originalWTHR > WTHR {
 		return h * WTHR, h
 	} else {
-		return w, w * WTHR
+		return w, w / WTHR
 	}
 }
+
+/*
+w=100
+h=300
+r=0.333333333
+nr=0.5
+
+nw=
+nh=
+*/
