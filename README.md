@@ -1,5 +1,10 @@
-# Vue 3 + TypeScript + Vite
+# Vue Material Design 3
 
-This template should help get you started developing with Vue 3 and TypeScript in Vite. The template uses Vue 3 `<script setup>` SFCs, check out the [script setup docs](https://v3.vuejs.org/api/sfc-script-setup.html#sfc-script-setup) to learn more.
 
-Learn more about the recommended Project Setup and IDE Support in the [Vue Docs TypeScript Guide](https://vuejs.org/guide/typescript/overview.html#project-setup).
+### step 1
+create your theme using [material-theme-builder](https://material-foundation.github.io/material-theme-builder/)
+and export it using json
+
+
+
+### to learn more about colors system in material design read [this](https://m3.material.io/styles/color/roles)
